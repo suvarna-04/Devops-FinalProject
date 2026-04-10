@@ -1,6 +1,15 @@
 version: "3.8"
 services:
   app:
-    image: enterprise/devops-finalproject:latest
+    image: devops-FinalProject:latest
     ports:
       - "5000:5000"
+    services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
