@@ -23,12 +23,15 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                bat 'docker build -t devops-finalproject/app -f docker/Dockerfile .'
-            }
-        }
+       stage('Docker Build') {
+    steps {
+        sh '''
+        export DOCKER_BUILDKIT=0
+        docker build -t devops-finalproject/app:latest -f docker/Dockerfile .
+        '''
     }
+   }
+ }
 
     post {
         success {
