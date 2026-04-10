@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  app:
+    image: enterprise/devops-demo
+    ports:
+      - "5000:5000"
