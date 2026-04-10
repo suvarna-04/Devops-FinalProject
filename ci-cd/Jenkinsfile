@@ -3,17 +3,11 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = "http://<sonarqube-ip>:9000"
-        IMAGE_NAME = "enterprise/devops-demo"
+        IMAGE_NAME = "devops-finalProject"
     }
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/suvarna-04/devops-FinalProject.git'
-            }
-        }
 
         stage('SonarQube Code Analysis') {
             steps {
