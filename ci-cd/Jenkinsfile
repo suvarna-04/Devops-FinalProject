@@ -1,33 +1,31 @@
 pipeline {
     agent any
 
-    environment {
-        SONAR_HOST_URL = "http://<sonarqube-ip>:9000"
-        IMAGE_NAME = "devops-finalProject"
-    }
-
     stages {
 
+        stage('Build') {
+            steps {
+                echo "Build stage completed"
+            }
+        }
 
         stage('SonarQube Code Analysis') {
-            stage('SonarQube Code Analysis') {
-    steps {
-        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-            bat '''
-            sonar-scanner ^
-            -Dsonar.projectKey=devops-finalproject ^
-            -Dsonar.sources=app ^
-            -Dsonar.host.url=http://localhost:9000 ^
-            -Dsonar.login=%SONAR_TOKEN%
-            '''
-        }
-    }
-}
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    bat '''
+                    sonar-scanner ^
+                    -Dsonar.projectKey=devops-finalproject ^
+                    -Dsonar.sources=app ^
+                    -Dsonar.host.url=http://localhost:9000 ^
+                    -Dsonar.login=%SONAR_TOKEN%
+                    '''
+                }
+            }
         }
 
         stage('Docker Build') {
             steps {
-                bat "docker build -t \$IMAGE_NAME:latest -f docker/Dockerfile ."
+                bat 'docker build -t devops-finalproject/app -f docker/Dockerfile .'
             }
         }
     }
