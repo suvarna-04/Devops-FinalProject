@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        SONAR_HOST_URL = "http://<sonarqube-ip>:9000"
+        IMAGE_NAME = "enterprise/devops-demo"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/suvarna-04/enterprise-devops-project.git'
+            }
+        }
+
+        stage('SonarQube Code Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    bat """
+                      sonar-scanner \
+                      -Dsonar.projectKey=devops-FinalProject \
+                      -Dsonar.sources=app \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_TOKEN
+                    """
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                bat "docker build -t \$IMAGE_NAME:latest -f docker/Dockerfile ."
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully"
+        }
+        failure {
+            echo "❌ Pipeline failed – check logs"
+        }
+    }
+}
