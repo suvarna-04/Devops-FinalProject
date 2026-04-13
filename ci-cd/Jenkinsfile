@@ -3,25 +3,33 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
-                echo "Build stage completed"
+                echo 'Build stage completed'
             }
         }
 
         stage('SonarQube Code Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    bat '''
-                    sonar-scanner ^
-                    -Dsonar.projectKey=devops-finalproject ^
-                    -Dsonar.sources=app ^
-                    -Dsonar.host.url=http://localhost:9000 ^
-                    -Dsonar.login=%SONAR_TOKEN%
-                    '''
+                withSonarQubeEnv('SonarQube') {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        bat '''
+                        sonar-scanner ^
+                        -Dsonar.projectKey=devops-finalproject ^
+                        -Dsonar.sources=app ^
+                        -Dsonar.login=%SONAR_TOKEN%
+                        '''
+                    }
                 }
             }
-        } 
+        }
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
@@ -29,24 +37,20 @@ pipeline {
                 }
             }
         }
-        
 
-       stage('Docker Build') {
-    steps {
-        bat '''
-        export DOCKER_BUILDKIT=0
-        docker build -t devops-finalproject/app:latest -f docker/Dockerfile .
-        '''
+        stage('Docker Build') {
+            steps {
+                echo 'Docker build skipped on Windows Jenkins'
+            }
+        }
     }
-   }
- }
 
     post {
         success {
-            echo "✅ Pipeline completed successfully"
+            echo '✅ Pipeline completed successfully'
         }
         failure {
-            echo "❌ Pipeline failed – check logs"
+            echo '❌ Pipeline failed'
         }
     }
 }
